@@ -10,6 +10,7 @@
 
 // TODO do using std::...; you degenerate
 // TODO maybe make it so multiple people can't have the same nickname
+// TODO check message signature before you add it to the list
 
 class message {
 public:
