@@ -86,32 +86,33 @@ rsa_plaintext rsa_decrypt (rsa_ciphertext ciphertext,rsa_privkey privkey){
   return plaintext;
 }
 
-
-
-
 string pad(rsa_plaintext){
   //LMAO USE A GENERIC AES TO PAD AS WELL
   //TODO
 }
 
-tuple<InfInt,InfInt> gcdExtended(InfInt a, InfInt b) {
-   if (a == 0)
-      return make_tuple(0, 1);
-   auto x1y1 = gcdExtended(b%a, a);
-   auto x1 = get<0>(x1y1);
-   auto y1 = get<1>(x1y1);
-   InfInt x = y1 - (b/a) * x1;
-   InfInt y = x1;
-   return make_tuple(x,y);
+tuple<InfInt,InfInt> gcdExtended(InfInt aOG, InfInt bOG) {
+  InfInt a = aOG;
+  InfInt b = bOG;
+  if (a == 0)
+    return make_tuple(0, 1);
+  auto x1y1 = gcdExtended(b%a, a);
+  auto x1 = get<0>(x1y1);
+  auto y1 = get<1>(x1y1);
+  InfInt x = y1 - (b/a) * x1;
+  cout << x << endl;
+  InfInt y = x1;
+  return make_tuple(x,y);
 }
 
 bool miller_rabin(InfInt testPrime){
   InfInt d = testPrime-1;
   int r;
-  for(r = 0; d % 2 == 1; r++)
+  for(r = 0; d % 2 != 1; r++)
     d /= 2;
 
   srand(time(0));
+
   for(int i = 0; i < ROUNDS; i++){ //make sure 1 < e < totient(n) (the totient is (p-1)(q-1))
     InfInt random = rand();
     InfInt a = (random % testPrime-4) + 2; // 2 < a < testPrime-2
@@ -121,11 +122,11 @@ bool miller_rabin(InfInt testPrime){
       continue;
     for(int j = 0; j < r; j++){
       x = powmodulo(x, 2, testPrime);
-      if(x == testPrime - 1)
-        continue;
-      else
-        return false;
+      if(x ==  testPrime - 1)
+        goto outerloop;
     }
+    return false;
+    outerloop:;
   }
   return true;
 }
@@ -136,6 +137,9 @@ InfInt generatePrime(InfInt bits){
   for(InfInt i = 1; i < infpow(2, bits); i *= RAND_MAX){ //generating number in approximate range
     MaybePrime *= RAND_MAX;
     MaybePrime += rand();
+  }
+  if(MaybePrime > infpow(2, bits)){
+    MaybePrime %= infpow(2, bits);
   }
 
   if(MaybePrime % 2 == 0){ //evens aren't prime
@@ -169,10 +173,14 @@ rsa_privkey rsa_keygen(int bits, InfInt e){
 
   InfInt n = p*q;
   InfInt totient = (p-1)*(q-1);
+  cout << "totient is: " << totient << endl;
 
 
   cout << "trying to find d "<< endl;
-  InfInt d = get<0>(gcdExtended(e, totient));
+  InfInt d = get<0>(gcdExtended(e, totient)) % totient;
+  if(d < 0)
+    d += totient;
+  cout << "generated d: " << d << endl;
 
   rsa_pubkey pubkey = make_tuple(n, e);
   rsa_privkey privkey = make_tuple(d, pubkey);

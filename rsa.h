@@ -17,5 +17,6 @@ rsa_ciphertext rsa_encrypt (rsa_plaintext,rsa_pubkey);
 rsa_plaintext rsa_decrypt (rsa_ciphertext,rsa_privkey);
 rsa_signature rsa_sign (rsa_ciphertext,rsa_privkey,InfInt(*hash)(rsa_ciphertext));
 bool rsa_verify (rsa_signature, rsa_pubkey, InfInt(*hash)(rsa_ciphertext));
+bool miller_rabin(InfInt testPrime);
 
 #endif
