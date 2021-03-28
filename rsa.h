@@ -11,7 +11,7 @@ typedef std::string rsa_plaintext;
 typedef InfInt rsa_ciphertext;
 typedef InfInt rsa_signature;
 
-rsa_privkey rsa_keygen();
+rsa_privkey rsa_keygen(int bits, InfInt e);
 rsa_pubkey  rsa_privkeyToPubkey(rsa_privkey);
 rsa_ciphertext rsa_encrypt (rsa_plaintext,rsa_pubkey);
 rsa_plaintext rsa_decrypt (rsa_ciphertext,rsa_privkey);

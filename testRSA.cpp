@@ -16,4 +16,11 @@ int main(){
   auto uncipher = rsa_decrypt(cipher, privkey);
 
   cout << uncipher << endl;
+
+  rsa_privkey privkey2 = rsa_keygen(1024, e);
+  rsa_pubkey pubkey2 = get<1>(privkey2);
+  auto cipher2 = rsa_encrypt("but samwise you're regarded! -frodo, the fellowship of the ring", pubkey2);
+  cout << "cipher2 received is: " << cipher2.toString() << endl;
+  auto uncipher2 = rsa_decrypt(cipher2, privkey2);
+  cout << uncipher2 << endl;
 }
